@@ -9,7 +9,14 @@
     integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" 
     crossorigin="anonymous">
     </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 </head>
+    {% if current_user.is_authenticated %}
+    <div>
+    <a href="/logout">Log Out</a>
+    <a href="/home">Home</a>
+    </div>
+    {% endif %}
 <body>
     <div class="content">
         {% block content %} {% endblock %}

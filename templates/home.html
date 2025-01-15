@@ -1,20 +1,78 @@
 {% extends 'base.html' %}
 {% block content %}
-<form method="post" class="buttons">
-    <h3>Enter the chat room</h3>
-    <div>
-        <label>Name:</label>
-        <input type="text" placeholder="Pick a name!" name="name" value="{{name}}"/>
-    </div>
-    <div class="join">
-        <input type="text" placeholder="Room Code" name="code" value="{{code}}" />
-        <button type="submit" name="join">Join a Room</button>
-    </div>
-    <button type="submit" name="create" class="create-btn">Create a Room</button>
-    {% if error %}
-    <ul>
-        <li>{{error}}</li>
-    </ul>
+<div>
+<h1>Welcome, {{ current_user.username }}</h1>
+<br />
+<h3>Click here to go to the <a href="chat">Chat Rooms</a></h3>
+
+{% for user in users %}
+    {% if (current_user in user.friends) and (user not in current_user.friends) %}
+    <p>{{ user.username }} has you added as a friend!             
+        <form action="/friend/{{ user.id }}" method="POST">
+        <input type="submit" value="Friend them back!">
+    </form>
+    </p>
     {% endif %}
-</form>
+{% endfor %}
+
+<input type="text" id="livebox">
+<a href="/profile" id = "datalist"></a>
+<script>
+    $(document).ready(function(){
+        $("#livebox").on("input",function(e){
+            $("#datalist").empty();
+            $.ajax({
+                method:"post",
+                url:"/livesearch",
+                data:{text:$("#livebox").val()},
+                success:function(res){
+                    var data = "<ul>";
+                    $.each(res,function(index,value){
+                        data += "<li>"+value.username+"</li>";
+                    });
+                    data += "</ul>";
+                    $("#datalist").html(data);
+                }
+            });
+        });
+    });
+</script>
+
+
+<p>Friends list</p>
+{% for user in current_user.friends %}
+    <a href="/profile/{{ user.id }}">{{ user.username }}</a>
+{% endfor %}
+<h2>What's on your mind today?</h2>
+<fieldset id="comment-form">
+    <form method="POST" action = "{{ url_for('home') }}">
+        {{ form.csrf_token }}
+
+            {{ form.data.label }}<br>
+            {{ form.data }}
+
+            <ul>
+                {% for error in form.data.errors %}
+                    <li class="error">{{ error }}</li>
+                {% endfor %}
+            </ul>
+
+            {{ form.submit }}
+    </form>
+</fieldset>
+
+<br />
+{% for post in posts %}
+    {% if (post.user in current_user.friends) or (post in current_user.posts) %}
+    <fieldset id="comment">
+        <a href="/profile/{{ post.user.id }}">{{ post.user.username }}</a>
+        
+        <p>{{ post.date }}</p>
+        <fieldset id="white">
+        <p>{{ post.data }}</p>
+        </fieldset>
+    </fieldset>
+    {% endif %}
+{% endfor %}
+</div>
 {% endblock %}

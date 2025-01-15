@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+{% extends 'base.html'%}
+{% block content %}
+<div>
+        <h2>{{ user.username }}</h2>
+        {% if current_user != user %}
+            {% if user not in current_user.friends %}
+            <form action="/friend/{{ user.id }}" method="POST">
+                <input type="submit" value="Friend">
+            </form>
+            {% else %}
+            <form action="/unfriend/{{ user.id }}" method="POST">
+                <input type="submit" value="Unfriend">
+            </form>
+            {% endif %}
+        {% endif %}
+        <h4>Posts</h4>
+        <div id="game-list-2">
+            <br />
+            {% for post in user.posts %}
+                <fieldset id="comment">
+                    <a href="/profile/{{ post.user.id }}">{{ post.user.username }}</a>
+                    
+                    <p>{{ post.date }}</p>
+                    <fieldset id="white">
+                    <p>{{ post.data }}</p>
+                    </fieldset>
+                </fieldset>
+            {% endfor %}
+            </div>
+</div>
+{% endblock %}
